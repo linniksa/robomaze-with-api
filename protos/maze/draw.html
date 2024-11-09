@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Maze editor</title>
+  <style>
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      padding: 0;
+      margin: 0;
+    }
+
+    .maze {
+      max-width: fit-content;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 20px;
+    }
+
+    .cell {
+      position: relative;
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      padding: 5px;
+      user-select: none;
+    }
+
+    .cell > span {
+      pointer-events: none;
+      position: absolute;
+      transform: translateY(-50%) translateX(-50%);
+      top: 50%;
+      left: 50%;
+      margin-top: 0.3em;
+      line-height: 1em;
+      text-indent: 5px;
+      font-size: 12px;
+      text-align: center;
+      display: none;
+    }
+
+    .cell:hover > span {
+      display: block;
+    }
+
+    .l-wall, .t-wall {
+      background: red;
+      position: absolute;
+      opacity: 0.1;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+    }
+
+    .l-wall:hover, .t-wall:hover {
+      opacity: 0.5;
+      transform: scale(1.25) scaleX(2);
+      border-radius: 10px;
+    }
+
+    .t-wall:hover {
+      transform: scale(1.25) scaleY(2);
+    }
+
+    .selected {
+      opacity: 1 !important;
+    }
+
+    .l-wall{
+      width: 5px;
+      top: 5px;
+      height: calc(100% - 5px);
+    }
+
+    .t-wall {
+      width: calc(100% - 5px);
+      height: 5px;
+      left: 5px;
+    }
+
+    textarea {
+      margin: 30px;
+      width: calc(100vw - 60px);
+      min-height: 100px;
+    }
+  </style>
+</head>
+
+<div class="maze">
+<script>
+  for (let i = 0; i < 16; i++) {
+    document.write(`<div>`)
+    for (let j = 0; j < 16; j++) {
+      document.write(`<div class="cell"><span>${i+1}x${j+1}</span>`)
+
+      if (j > 0) {
+        const code = `addWalls(${i}, ${j}, 'L')`
+        document.write(`<div class="l-wall" data-code="${code}"></div>`)
+      }
+      if (i > 0) {
+        const code = `addWalls(${i}, ${j}, 'T')`
+        document.write(`<div class="t-wall" data-code="${code}"></div>`)
+      }
+
+      document.write(`</div>`)
+    }
+    document.write(`</div>`)
+  }
+</script>
+
+</div>
+
+<textarea id="output"></textarea>
+
+<script>
+  function gen() {
+    let out = [];
+    document.querySelectorAll('.selected').forEach((e) => {
+      out.push(e.dataset.code)
+    })
+    document.getElementById('output').innerText = out.join(";")
+  }
+
+  function onClick(e) {
+    e.target.classList.toggle('selected')
+    gen()
+  }
+
+  function onEnter(e) {
+    if (e.buttons > 0) {
+      e.target.classList.toggle('selected')
+    }
+  }
+
+  window.addEventListener('load', function(event) {
+    for (let el of document.querySelectorAll(".l-wall, .t-wall")) {
+      el.addEventListener('click', onClick);
+      el.addEventListener('mouseenter', onEnter);
+    }
+  });
+</script>
+</html>

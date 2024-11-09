@@ -1,0 +1,55 @@
+#VRML_SIM R2022a utf8
+# template language: javascript
+# Maze Wall
+
+PROTO Wall [
+  field SFVec3f    translation           0 0 0
+  field SFRotation rotation              0 0 0 0
+  field SFString   name                  "Maze Wall"
+  field SFVec3f    size                  0.168 0.012 0.05
+  field SFString   contactMaterial       "default"
+  field SFColor    baseColor             1 0 0
+  field SFNode     physics               NULL
+  field SFBool     enableBoundingObject  TRUE
+  field SFBool     castShadows           TRUE
+]
+{
+  %<
+    let size = fields.size.value;
+
+    if (size.x <= 0 || size.y <= 0 || size.z <= 0) {
+      size = fields.size.defaultValue;
+      console.error('\'size\' must contain positive values. Value reset to (' + size.x + ', ' + size.y + ', ' + size.z + ').');
+    }
+
+  >%
+  Solid {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Shape {
+        appearance PBRAppearance {
+          baseColor IS baseColor
+          metalness 0
+          roughness 0.5
+        }
+        geometry Box {
+          size IS size
+        }
+        castShadows IS castShadows
+        isPickable FALSE
+      }
+    ]
+    name IS name
+    model "box"
+    contactMaterial IS contactMaterial
+    %< if (fields.enableBoundingObject.value) { >%
+    boundingObject Box {
+      size IS size
+    }
+    %< } >%
+    physics IS physics
+
+    locked TRUE
+  }
+}

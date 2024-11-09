@@ -1,0 +1,206 @@
+#VRML_SIM R2022a utf8
+# template language: javascript
+# A maze object.
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "Wall.proto"
+
+PROTO Maze [
+  field SFVec3f    translation           0 0 0
+  field SFString   name                  "Maze"
+  field SFString                         {"robobulls", "default"}
+                   variant               "default"
+]
+
+{
+  %<
+    import * as wbrandom from 'wbrandom.js';
+
+    let translation = fields.translation.value;
+
+    const sizes = {
+      wall: 0.168,
+      pillar: 0.012,
+      height: 0.05,
+      cells: 16,
+    }
+
+    const full_length = sizes.cells * (sizes.wall + sizes.pillar) + sizes.pillar
+
+    function __t(x, y, z = 0) {
+      return [x + translation.x - full_length/2, y + translation.y - full_length/2, z + translation.z].join(' ')
+    }
+
+    function random_color(always_red) {
+      if (wbrandom.integer(0, 2) && !always_red) {
+        return [20/255, 30/255, 30/255]
+      }
+
+      return [1, 0, 0]
+    }
+
+
+    let mapPoints = {}
+
+    function hasWall(x1, y1, x2, y2) {
+        return mapPoints[getOffset(x1, y1, x2, y2)]
+    }
+
+    function addWalls(y1, x1, ...walls) {
+        for (let w of walls) {
+            switch (w.toUpperCase()) {
+                case 'T': mapPoints[getOffset(x1, y1, x1, y1 - 1)] = true; break;
+                case 'B': mapPoints[getOffset(x1, y1, x1, y1 + 1)] = true; break;
+
+                case 'R': mapPoints[getOffset(x1, y1, x1 + 1, y1)] = true; break;
+                case 'L': mapPoints[getOffset(x1, y1, x1 - 1, y1)] = true; break;
+            }
+        }
+    }
+
+    function getOffset(x1, y1, x2, y2) {
+        let a = x1 + ',' + y1;
+        let b = x2 + ',' + y2;
+
+        let x = 'off_' + a + 'x' + b;
+        if (x2 <= x1 && y2 <= y1) {
+            x = 'off_' + b + 'x' + a;
+        }
+
+        return x
+    }
+
+    const maps = {
+      "robobulls": () => { addWalls(1, 1, 'L');addWalls(1, 1, 'T');addWalls(1, 2, 'T');addWalls(1, 3, 'T');addWalls(1, 4, 'T');addWalls(1, 5, 'L');addWalls(1, 5, 'T');addWalls(1, 6, 'T');addWalls(1, 7, 'T');addWalls(1, 8, 'T');addWalls(1, 9, 'T');addWalls(1, 10, 'T');addWalls(1, 11, 'T');addWalls(1, 12, 'T');addWalls(1, 13, 'T');addWalls(1, 14, 'T');addWalls(2, 1, 'L');addWalls(2, 2, 'L');addWalls(2, 2, 'T');addWalls(2, 3, 'T');addWalls(2, 4, 'T');addWalls(2, 5, 'L');addWalls(2, 6, 'T');addWalls(2, 7, 'L');addWalls(2, 7, 'T');addWalls(2, 8, 'T');addWalls(2, 9, 'L');addWalls(2, 9, 'T');addWalls(2, 10, 'T');addWalls(2, 11, 'L');addWalls(2, 11, 'T');addWalls(2, 12, 'T');addWalls(2, 13, 'T');addWalls(2, 14, 'T');addWalls(2, 15, 'L');addWalls(3, 1, 'L');addWalls(3, 2, 'L');addWalls(3, 3, 'L');addWalls(3, 3, 'T');addWalls(3, 4, 'L');addWalls(3, 5, 'T');addWalls(3, 6, 'L');addWalls(3, 8, 'L');addWalls(3, 10, 'L');addWalls(3, 11, 'L');addWalls(3, 12, 'T');addWalls(3, 13, 'L');addWalls(3, 13, 'T');addWalls(3, 15, 'L');addWalls(4, 1, 'L');addWalls(4, 2, 'L');addWalls(4, 4, 'T');addWalls(4, 5, 'L');addWalls(4, 6, 'L');addWalls(4, 6, 'T');addWalls(4, 7, 'T');addWalls(4, 8, 'L');addWalls(4, 8, 'T');addWalls(4, 9, 'T');addWalls(4, 10, 'L');addWalls(4, 11, 'L');addWalls(4, 11, 'T');addWalls(4, 13, 'L');addWalls(4, 14, 'T');addWalls(4, 15, 'L');addWalls(5, 1, 'L');addWalls(5, 2, 'L');addWalls(5, 2, 'T');addWalls(5, 4, 'L');addWalls(5, 4, 'T');addWalls(5, 6, 'L');addWalls(5, 7, 'L');addWalls(5, 9, 'L');addWalls(5, 11, 'L');addWalls(5, 12, 'L');addWalls(5, 12, 'T');addWalls(5, 13, 'L');addWalls(5, 13, 'T');addWalls(5, 15, 'L');addWalls(6, 1, 'L');addWalls(6, 2, 'L');addWalls(6, 3, 'L');addWalls(6, 3, 'T');addWalls(6, 5, 'L');addWalls(6, 5, 'T');addWalls(6, 6, 'L');addWalls(6, 7, 'T');addWalls(6, 8, 'T');addWalls(6, 9, 'T');addWalls(6, 10, 'T');addWalls(6, 12, 'L');addWalls(6, 14, 'T');addWalls(6, 15, 'L');addWalls(7, 1, 'L');addWalls(7, 2, 'L');addWalls(7, 3, 'L');addWalls(7, 4, 'L');addWalls(7, 4, 'T');addWalls(7, 6, 'L');addWalls(7, 7, 'L');addWalls(7, 7, 'T');addWalls(7, 8, 'T');addWalls(7, 9, 'L');addWalls(7, 9, 'T');addWalls(7, 10, 'T');addWalls(7, 11, 'T');addWalls(7, 13, 'L');addWalls(7, 14, 'L');addWalls(7, 14, 'T');addWalls(8, 1, 'L');addWalls(8, 2, 'L');addWalls(8, 3, 'L');addWalls(8, 5, 'L');addWalls(8, 6, 'T');addWalls(8, 7, 'L');addWalls(8, 9, 'L');addWalls(8, 10, 'T');addWalls(8, 11, 'T');addWalls(8, 12, 'L');addWalls(8, 12, 'T');addWalls(8, 13, 'T');addWalls(8, 15, 'L');addWalls(9, 1, 'L');addWalls(9, 2, 'L');addWalls(9, 3, 'L');addWalls(9, 4, 'L');addWalls(9, 4, 'T');addWalls(9, 5, 'T');addWalls(9, 7, 'L');addWalls(9, 7, 'T');addWalls(9, 9, 'T');addWalls(9, 10, 'T');addWalls(9, 11, 'L');addWalls(9, 12, 'L');addWalls(9, 13, 'L');addWalls(9, 14, 'L');addWalls(9, 14, 'T');addWalls(9, 15, 'L');addWalls(10, 1, 'L');addWalls(10, 2, 'L');addWalls(10, 3, 'L');addWalls(10, 3, 'T');addWalls(10, 5, 'L');addWalls(10, 5, 'T');addWalls(10, 6, 'L');addWalls(10, 6, 'T');addWalls(10, 7, 'T');addWalls(10, 8, 'T');addWalls(10, 9, 'L');addWalls(10, 10, 'T');addWalls(10, 11, 'L');addWalls(10, 12, 'L');addWalls(10, 13, 'T');addWalls(10, 15, 'L');addWalls(11, 1, 'L');addWalls(11, 2, 'L');addWalls(11, 3, 'L');addWalls(11, 4, 'T');addWalls(11, 6, 'L');addWalls(11, 7, 'T');addWalls(11, 8, 'L');addWalls(11, 9, 'L');addWalls(11, 9, 'T');addWalls(11, 11, 'L');addWalls(11, 12, 'T');addWalls(11, 13, 'T');addWalls(11, 14, 'L');addWalls(11, 15, 'L');addWalls(12, 1, 'L');addWalls(12, 2, 'L');addWalls(12, 3, 'L');addWalls(12, 3, 'T');addWalls(12, 4, 'T');addWalls(12, 6, 'L');addWalls(12, 7, 'T');addWalls(12, 8, 'L');addWalls(12, 10, 'L');addWalls(12, 11, 'L');addWalls(12, 11, 'T');addWalls(12, 12, 'T');addWalls(12, 13, 'L');addWalls(12, 14, 'L');addWalls(12, 15, 'L');addWalls(13, 2, 'L');addWalls(13, 3, 'L');addWalls(13, 4, 'T');addWalls(13, 5, 'T');addWalls(13, 6, 'T');addWalls(13, 8, 'L');addWalls(13, 9, 'T');addWalls(13, 10, 'T');addWalls(13, 12, 'L');addWalls(13, 14, 'L');addWalls(13, 15, 'L');addWalls(14, 1, 'L');addWalls(14, 2, 'L');addWalls(14, 3, 'T');addWalls(14, 4, 'T');addWalls(14, 5, 'T');addWalls(14, 6, 'T');addWalls(14, 7, 'T');addWalls(14, 8, 'T');addWalls(14, 9, 'T');addWalls(14, 10, 'T');addWalls(14, 11, 'T');addWalls(14, 12, 'T');addWalls(14, 13, 'T');addWalls(14, 15, 'L');addWalls(15, 1, 'L');addWalls(15, 2, 'T');addWalls(15, 3, 'T');addWalls(15, 4, 'T');addWalls(15, 5, 'T');addWalls(15, 6, 'T');addWalls(15, 7, 'T');addWalls(15, 8, 'T');addWalls(15, 9, 'T');addWalls(15, 10, 'T');addWalls(15, 11, 'T');addWalls(15, 12, 'T');addWalls(15, 13, 'T');addWalls(15, 14, 'T'); },
+      "default": () => { addWalls(0, 3, 'L');addWalls(0, 7, 'L');addWalls(0, 12, 'L');addWalls(1, 1, 'T');addWalls(1, 2, 'L');addWalls(1, 3, 'L');addWalls(1, 4, 'T');addWalls(1, 5, 'L');addWalls(1, 6, 'T');addWalls(1, 8, 'L');addWalls(1, 8, 'T');addWalls(1, 9, 'L');addWalls(1, 10, 'T');addWalls(1, 11, 'T');addWalls(1, 13, 'L');addWalls(1, 13, 'T');addWalls(1, 14, 'L');addWalls(1, 15, 'L');addWalls(2, 1, 'L');addWalls(2, 2, 'L');addWalls(2, 3, 'L');addWalls(2, 3, 'T');addWalls(2, 4, 'L');addWalls(2, 5, 'L');addWalls(2, 5, 'T');addWalls(2, 6, 'T');addWalls(2, 7, 'T');addWalls(2, 9, 'T');addWalls(2, 10, 'T');addWalls(2, 11, 'T');addWalls(2, 12, 'T');addWalls(2, 14, 'L');addWalls(2, 15, 'L');addWalls(3, 1, 'L');addWalls(3, 2, 'L');addWalls(3, 3, 'L');addWalls(3, 4, 'L');addWalls(3, 5, 'L');addWalls(3, 6, 'T');addWalls(3, 7, 'L');addWalls(3, 8, 'L');addWalls(3, 9, 'L');addWalls(3, 9, 'T');addWalls(3, 10, 'T');addWalls(3, 11, 'T');addWalls(3, 12, 'L');addWalls(3, 14, 'L');addWalls(3, 15, 'L');addWalls(4, 1, 'L');addWalls(4, 2, 'L');addWalls(4, 4, 'L');addWalls(4, 5, 'T');addWalls(4, 6, 'T');addWalls(4, 8, 'L');addWalls(4, 9, 'L');addWalls(4, 10, 'L');addWalls(4, 10, 'T');addWalls(4, 12, 'L');addWalls(4, 14, 'L');addWalls(4, 15, 'L');addWalls(5, 1, 'L');addWalls(5, 2, 'T');addWalls(5, 3, 'L');addWalls(5, 4, 'L');addWalls(5, 4, 'T');addWalls(5, 5, 'T');addWalls(5, 6, 'T');addWalls(5, 8, 'L');addWalls(5, 8, 'T');addWalls(5, 10, 'L');addWalls(5, 11, 'T');addWalls(5, 12, 'T');addWalls(5, 13, 'T');addWalls(5, 15, 'L');addWalls(6, 1, 'L');addWalls(6, 1, 'T');addWalls(6, 2, 'L');addWalls(6, 3, 'T');addWalls(6, 5, 'L');addWalls(6, 5, 'T');addWalls(6, 6, 'L');addWalls(6, 6, 'T');addWalls(6, 7, 'T');addWalls(6, 9, 'L');addWalls(6, 9, 'T');addWalls(6, 10, 'T');addWalls(6, 11, 'T');addWalls(6, 12, 'L');addWalls(6, 12, 'T');addWalls(6, 13, 'T');addWalls(6, 14, 'T');addWalls(7, 1, 'L');addWalls(7, 2, 'T');addWalls(7, 3, 'T');addWalls(7, 4, 'T');addWalls(7, 6, 'L');addWalls(7, 7, 'T');addWalls(7, 8, 'T');addWalls(7, 9, 'L');addWalls(7, 10, 'L');addWalls(7, 11, 'L');addWalls(7, 11, 'T');addWalls(7, 13, 'L');addWalls(7, 13, 'T');addWalls(7, 14, 'T');addWalls(7, 15, 'T');addWalls(8, 1, 'L');addWalls(8, 2, 'L');addWalls(8, 2, 'T');addWalls(8, 3, 'T');addWalls(8, 4, 'L');addWalls(8, 4, 'T');addWalls(8, 5, 'T');addWalls(8, 7, 'L');addWalls(8, 9, 'L');addWalls(8, 10, 'L');addWalls(8, 12, 'L');addWalls(8, 12, 'T');addWalls(8, 13, 'L');addWalls(8, 14, 'L');addWalls(8, 14, 'T');addWalls(8, 15, 'L');addWalls(9, 1, 'L');addWalls(9, 3, 'L');addWalls(9, 4, 'L');addWalls(9, 5, 'L');addWalls(9, 5, 'T');addWalls(9, 6, 'T');addWalls(9, 7, 'L');addWalls(9, 7, 'T');addWalls(9, 8, 'T');addWalls(9, 9, 'L');addWalls(9, 10, 'T');addWalls(9, 11, 'T');addWalls(9, 12, 'L');addWalls(9, 13, 'L');addWalls(9, 15, 'L');addWalls(10, 1, 'T');addWalls(10, 2, 'T');addWalls(10, 4, 'L');addWalls(10, 5, 'T');addWalls(10, 6, 'L');addWalls(10, 7, 'L');addWalls(10, 8, 'L');addWalls(10, 9, 'T');addWalls(10, 10, 'L');addWalls(10, 10, 'T');addWalls(10, 12, 'L');addWalls(10, 14, 'L');addWalls(10, 14, 'T');addWalls(11, 0, 'T');addWalls(11, 2, 'L');addWalls(11, 2, 'T');addWalls(11, 3, 'T');addWalls(11, 4, 'L');addWalls(11, 4, 'T');addWalls(11, 6, 'L');addWalls(11, 8, 'L');addWalls(11, 9, 'T');addWalls(11, 10, 'L');addWalls(11, 11, 'L');addWalls(11, 11, 'T');addWalls(11, 13, 'L');addWalls(11, 13, 'T');addWalls(11, 14, 'L');addWalls(11, 15, 'L');addWalls(12, 1, 'L');addWalls(12, 1, 'T');addWalls(12, 3, 'L');addWalls(12, 5, 'L');addWalls(12, 5, 'T');addWalls(12, 7, 'L');addWalls(12, 7, 'T');addWalls(12, 8, 'T');addWalls(12, 9, 'L');addWalls(12, 11, 'L');addWalls(12, 12, 'T');addWalls(12, 14, 'L');addWalls(12, 15, 'T');addWalls(13, 1, 'L');addWalls(13, 2, 'T');addWalls(13, 3, 'L');addWalls(13, 3, 'T');addWalls(13, 4, 'T');addWalls(13, 5, 'L');addWalls(13, 6, 'T');addWalls(13, 7, 'L');addWalls(13, 7, 'T');addWalls(13, 9, 'T');addWalls(13, 10, 'T');addWalls(13, 13, 'L');addWalls(13, 13, 'T');addWalls(13, 14, 'T');addWalls(14, 1, 'T');addWalls(14, 2, 'L');addWalls(14, 3, 'L');addWalls(14, 4, 'L');addWalls(14, 5, 'T');addWalls(14, 6, 'L');addWalls(14, 7, 'L');addWalls(14, 8, 'T');addWalls(14, 9, 'L');addWalls(14, 9, 'T');addWalls(14, 10, 'T');addWalls(14, 11, 'T');addWalls(14, 12, 'L');addWalls(14, 13, 'L');addWalls(14, 14, 'T');addWalls(14, 15, 'T');addWalls(15, 0, 'T');addWalls(15, 1, 'T');addWalls(15, 3, 'L');addWalls(15, 4, 'L');addWalls(15, 5, 'T');addWalls(15, 7, 'T');addWalls(15, 9, 'L');addWalls(15, 10, 'T');addWalls(15, 11, 'L');addWalls(15, 13, 'T');addWalls(15, 14, 'T') },
+    }
+
+    maps[fields.variant.value]()
+
+  >%
+
+# External walls
+  Group {
+    children [
+      Solid {
+        translation %<= __t(full_length / 2, full_length / 2, 0 ) >%
+        rotation 0 0 0 0
+        children [
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.2 0.2 0.2
+              metalness 0
+              roughness 0.7
+            }
+            geometry IndexedFaceSet {
+              coord Coordinate {
+                point [
+                  %<= -(full_length * 0.5) >% %<= -(full_length * 0.5) >% 0
+                  %<= full_length * 0.5 >% %<= -(full_length * 0.5) >% 0
+                  %<= -(full_length * 0.5) >% %<= full_length * 0.5 >% 0
+                  %<= full_length * 0.5 >% %<= full_length * 0.5 >% 0
+                ]
+              }
+              coordIndex [
+                2 0 1 3 -1
+              ]
+            }
+          }
+        ]
+        name IS name
+        model "floor"
+        boundingObject Plane {
+          size %<= [full_length, full_length].join(' ') >%
+        }
+        contactMaterial "default"
+        locked TRUE
+      }
+
+      Wall {
+        name "Wall - Top"
+        translation %<= __t(full_length / 2, full_length - sizes.pillar / 2, sizes.height / 2) >%
+        size %<= [full_length, sizes.pillar, sizes.height].join(' ') >%
+      }
+
+      Wall {
+        name "Wall - Bottom"
+        translation %<= __t(full_length / 2, sizes.pillar / 2, sizes.height / 2) >%
+        size %<= [full_length, sizes.pillar, sizes.height].join(' ') >%
+      }
+
+      Wall {
+        name "Wall - Right"
+        translation %<= __t(full_length - sizes.pillar/2, full_length / 2, sizes.height / 2) >%
+        size %<= [sizes.pillar, full_length - sizes.pillar * 2, sizes.height].join(' ') >%
+      }
+
+      Wall {
+        name "Wall - Left"
+        translation %<= __t(sizes.pillar / 2, full_length / 2, sizes.height / 2) >%
+        size %<= [sizes.pillar, full_length - sizes.pillar * 2, sizes.height].join(' ') >%
+      }
+
+      %<
+        let walls = [];
+
+        for (let i = 1; i < 16; i++) {
+          for (let j = 1; j < 16; j++) {
+            // center
+            if (i == 8 && j == 8) {
+            	continue;
+            }
+
+            let x = i * 0.180 + sizes.pillar / 2
+            let y = j * 0.180 + sizes.pillar / 2
+
+            walls.push('Wall {');
+            walls.push('name "Pillar - ' + i + 'x' + j +  '"');
+            walls.push('translation ' + __t(x, y, sizes.height / 2) );
+            walls.push('size ' + [sizes.pillar, sizes.pillar, sizes.height].join(' '));
+            walls.push('baseColor ' + random_color(false).join(' '));
+            walls.push('}');
+        }
+      }
+
+
+        for (let i = 0; i < 16; i++ ) {
+          for (let j = 0; j < 16; j++ ) {
+            let wTop = hasWall(i, j - 1, i, j);
+            let wLeft = hasWall(i - 1, j, i, j);
+
+            if (i == 0) { wLeft = false }
+            if (j == 0) { wTop = false }
+
+            let x =  i * 0.18 + sizes.pillar / 2;
+            let y =  full_length - sizes.pillar - j * 0.18 + sizes.pillar / 2;
+
+            const centerCell = (i >= 7 && i <= 9) && (j >= 7 && j <= 9)
+            let colors = random_color(centerCell)
+
+            if (wTop) {
+              walls.push('Wall {');
+              walls.push('name "Wall Top - ' + i + 'x' + j +  '"');
+              walls.push('translation ' + __t(x + sizes.pillar / 2 + sizes.wall / 2, y, sizes.height / 2));
+              walls.push('size ' + [sizes.wall, sizes.pillar, sizes.height].join(' '));
+              walls.push('baseColor ' + colors.join(' '));
+              walls.push('}');
+            };
+
+            if (wLeft) {
+              walls.push('Wall {');
+              walls.push('name "Wall Left - ' + i + 'x' + j +  '"');
+              walls.push('translation ' + __t(x, y - sizes.pillar / 2 - sizes.wall / 2, sizes.height / 2));
+              walls.push('size ' + [sizes.pillar, sizes.wall, sizes.height].join(' '));
+              walls.push('baseColor ' + colors.join(' '));
+              walls.push('}');
+            };
+          }
+        }
+      >%
+
+      %<= walls.join('\n') >%
+    ]
+  }
+
+}

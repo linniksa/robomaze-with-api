@@ -1,0 +1,329 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "../protos/maze/Maze.proto"
+
+WorldInfo {
+  basicTimeStep 10
+  contactProperties [
+    ContactProperties {
+      maxContactJoints 20
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 9.501487075814134e-06 9.501513943583901e-06 6.902227258142964
+  follow "e-puck"
+}
+Background {
+  skyColor [
+    0.15 0.45 1
+  ]
+}
+TexturedBackgroundLight {
+}
+PointLight {
+  attenuation 0 0 1
+  intensity 21
+  location 4 4 6
+  radius 10
+  castShadows TRUE
+}
+Robot {
+  translation -1.34 -1.36 0.013
+  children [
+    DEF BODY Shape {
+      appearance PBRAppearance {
+        baseColor 0.7 0.7 0.7
+        roughness 0.8
+        metalness 0
+      }
+      geometry IndexedFaceSet {
+        coord Coordinate {
+          point [
+            -0.023 -0.035 -0.004
+            0.023 -0.035 -0.004
+            0.03 -0.028 -0.004
+            0.03 0.028 -0.004
+            0.023 0.035 -0.004
+            -0.023 0.035 -0.004
+            -0.03 0.028 -0.004
+            -0.03 -0.028 -0.004
+            -0.023 -0.035 0
+            0.023 -0.035 0
+            0.03 -0.028 0
+            0.03 0.028 0
+            0.023 0.035 0
+            -0.023 0.035 0
+            -0.03 0.028 0
+            -0.03 -0.028 0
+          ]
+        }
+        coordIndex [
+          7, 2, 1, 0, -1, 7, 6, 3, 2, -1, 6, 5, 4, 3, -1, 8, 9, 10, 15, -1, 10, 11, 14, 15, -1, 11, 12, 13, 14, -1, 7, 0, 8, 15, -1, 0, 1, 9, 8, -1, 1, 2, 10, 9, -1, 2, 3, 11, 10, -1, 3, 4, 12, 11, -1, 4, 5, 13, 12, -1, 5, 6, 14, 13, -1, 6, 7, 15, 14, -1
+        ]
+        creaseAngle 1.5
+      }
+    }
+    DEF WHEEL1 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor 0.039 0.016 0
+      }
+      device [
+        RotationalMotor {
+          name "wheel1"
+          maxVelocity 100
+        }
+        PositionSensor {
+          name "left wheel sensor"
+          resolution 0.00628
+        }
+      ]
+      endPoint Solid {
+        translation 0.039 0.016 0
+        rotation 0 1 0 1.5708003061004252
+        children [
+          DEF WHEEL Shape {
+            appearance PBRAppearance {
+              baseColor 0.2 0.2 0.2
+              roughness 0.8
+              metalness 0.1
+            }
+            geometry Cylinder {
+              height 0.008
+              radius 0.0125
+              subdivision 72
+            }
+          }
+        ]
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL2 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor 0.039 -0.016 0
+      }
+      device [
+        RotationalMotor {
+          name "wheel2"
+          maxVelocity 100
+        }
+      ]
+      endPoint Solid {
+        translation 0.039 -0.016 0
+        rotation 0 1 0 1.5708003061004252
+        children [
+          USE WHEEL
+        ]
+        name "solid(1)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL3 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor -0.039 0.016 0
+      }
+      device [
+        RotationalMotor {
+          name "wheel3"
+          maxVelocity 100
+        }
+        PositionSensor {
+          name "right wheel sensor"
+          resolution 0.00628
+        }
+      ]
+      endPoint Solid {
+        translation -0.039 0.016 0
+        rotation 0 1 0 1.5708003061004252
+        children [
+          USE WHEEL
+        ]
+        name "solid(2)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF WHEEL4 HingeJoint {
+      jointParameters HingeJointParameters {
+        anchor -0.039 -0.016 0
+      }
+      device [
+        RotationalMotor {
+          name "wheel4"
+          maxVelocity 100
+        }
+      ]
+      endPoint Solid {
+        translation -0.039 -0.016 0
+        rotation 0 1 0 1.5708003061004252
+        children [
+          USE WHEEL
+        ]
+        name "solid(3)"
+        boundingObject USE WHEEL
+        physics Physics {
+        }
+      }
+    }
+    DEF DS_R45 DistanceSensor {
+      translation 0.028 0.028 0.012
+      rotation 0 0 1 0.785398
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.005 0.02
+          }
+        }
+      ]
+      name "ds_r45"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    DEF DS_L45 DistanceSensor {
+      translation -0.028 0.028 0.012
+      rotation 0 0 1 2.356192
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.005 0.02
+          }
+        }
+      ]
+      name "ds_l45"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    DEF DS_RIGHT DistanceSensor {
+      translation 0.028 0.012 0.021
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.02 0.005
+          }
+        }
+      ]
+      name "ds_right"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    DEF DS_LEFT DistanceSensor {
+      translation -0.028 0.012 0.021
+      rotation 0 0 1 3.14159
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.02 0.005
+          }
+        }
+      ]
+      name "ds_left"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    DEF DS_FRONT DistanceSensor {
+      translation 0 0.028 0.0077
+      rotation 0 0 1 1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.02 0.005
+          }
+        }
+      ]
+      name "ds_front"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    DEF DS_BACK DistanceSensor {
+      translation 0 -0.028 0.0077
+      rotation 0 0 1 -1.5708
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.184314 0.596078 0.847059
+            roughness 1
+            metalness 0
+          }
+          geometry Box {
+            size 0.001 0.02 0.005
+          }
+        }
+      ]
+      name "ds_back"
+      lookupTable [
+        0 0 0.05
+        2 2000 0.12
+        2.1 65535 0.2
+      ]
+      type "laser"
+      aperture 0.003
+    }
+    InertialUnit {
+    }
+  ]
+  boundingObject USE BODY
+  physics Physics {
+    density -1
+    mass 0.25
+  }
+  controller "Remote"
+}
+Maze {
+}
