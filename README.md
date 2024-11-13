@@ -9,6 +9,13 @@
  - https://github.com/TLe1289/Robobulls_Micromouse_2023/tree/main/WebotsMicroMouse
  - https://github.com/emstef/Micromouse
 
+Таймер
+===
+
+Таймер запускается когда любая часть робота выходит за границы первой клетки.
+Таймер останавливается когда робот полностью находится в границах 4 центральных клеток лабиринта
+
+
 Troubleshooting
 ===
 
